@@ -4,10 +4,12 @@ Created on Fri Apr 19 23:29:01 2019
 
 @author: Bruno Ferraz Silveira
 """
-import pandas
+
+import pandas as pd
+from sklearn.preprocessing import Imputer, StandardScaler
 
 # leitura do arquivo csv e joga isso na variável base
-base = pandas.read_csv('credit-data.csv')
+base = pd.read_csv('credit-data.csv')
 
 # para mostrar os dados dessa variável
 # base.describe()
@@ -32,21 +34,18 @@ base['age'].mean()
 base.loc[base.age < 0, 'age'] = base['age'][base.age > 0].mean()
 
 # pega valores nulos da coluna age
-pandas.isnull(base['age'])
-base.loc[pandas.isnull(base['age'])]
+pd.isnull(base['age'])
+base.loc[pd.isnull(base['age'])]
 
 # separando em arrays as colunas previsoras e a coluna de classificação
 previsores = base.iloc[:, 1:4].values
 classe = base.iloc[:, 4].values
 
-# colocando a média no lugar de valores NaN
-from sklearn.preprocessing import Imputer
+# padroniza dados para que não hajam diferenças discrepantes e os algorítmos baseados em distâncias (como distância euclidiana) não deem mais importância a algum valor por ter uma diferença maior de valores
 imputer = Imputer(missing_values='NaN', strategy='mean', axis=0)
 imputer = imputer.fit(previsores[:, 0:3])
 previsores[:,0:3] = imputer.transform(previsores[:,0:3])
 
-# padroniza dados para que não hajam diferenças discrepantes e os algorítmos baseados em distâncias (como distância euclidiana) não deem mais importância a algum valor por ter uma diferença maior de valores
-from sklearn.preprocessing import StandardScaler
+# colocando a média no lugar de valores NaN
 scaler = StandardScaler()
 previsores = scaler.fit_transform(previsores)
-
